@@ -5,6 +5,28 @@ const setupServer = () => {
   /**
    * Create, set up and return your express server, split things into separate files if it becomes too long!
    */
+  function removeZeros(strNum) {
+    if (strNum !== undefined) {
+      let num;
+      if (strNum.charAt(0) === "0") {
+        num = strNum
+          .split("")
+          .slice(1, strNum.length)
+          .join("");
+      } else {
+        num = Number(strNum);
+      }
+      return num;
+    }
+  }
+
+  function findPokemonIndexByName(name) {
+    for (let i = 0; i < pokeData.pokemon.length; i++) {
+      if (pokeData.pokemon[i].name === name) {
+        return i;
+      }
+    }
+  }
 
   const app = express();
 
@@ -15,29 +37,6 @@ const setupServer = () => {
       undefined || findPokemonIndexByName(request.query.name);
     const id = undefined || removeZeros(request.query.id);
     const limit = undefined || request.query.limit;
-
-    function removeZeros(strNum) {
-      if (strNum !== undefined) {
-        let num;
-        if (strNum.charAt(0) === "0") {
-          num = strNum
-            .split("")
-            .slice(1, strNum.length)
-            .join("");
-        } else {
-          num = Number(strNum);
-        }
-        return num;
-      }
-    }
-
-    function findPokemonIndexByName(name) {
-      for (let i = 0; i < pokeData.pokemon.length; i++) {
-        if (pokeData.pokemon[i].name === name) {
-          return i;
-        }
-      }
-    }
 
     if (limit) {
       response.send(pokeData.pokemon.slice(0, limit));
@@ -53,19 +52,23 @@ const setupServer = () => {
   });
 
   app.patch("/api/pokemon", (request, response) => {
-    const id = undefined || request.query.id;
+    const indexOfPokemon =
+      undefined || findPokemonIndexByName(request.query.name);
+    const id = undefined || removeZeros(request.query.id);
+    // const id = undefined || request.query.id;
     // const name = undefined || request.query.name;
 
-    if (id) {
-      for (let i = 0; i < pokeData.pokemon.length; i++) {
-        if (id === pokeData.pokemon[i].id) {
-          pokeData.pokemon[i] = request.body;
-          response.send(pokeData.pokemon[i]);
-          break;
-        }
-      }
+    const index = id - 1 || indexOfPokemon;
+    if (index) {
+      // for (let i = 0; i < pokeData.pokemon.length; i++) {
+      //   if (id === pokeData.pokemon[i].id) {
+      pokeData.pokemon[index] = request.body;
+      response.send(pokeData.pokemon[index]);
+      // break;
     }
   });
+
+  app.delete("/api/pokemon", (request, response) => {});
 
   // app.get("/api/pokemon/:id")
 

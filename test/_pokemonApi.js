@@ -20,7 +20,7 @@ describe("Pokemon API Server", () => {
   });
 
   describe("GET", () => {
-    xdescribe("/api/pokemon", () => {
+    describe("/api/pokemon", () => {
       it("should return all pokemon", async () => {
         const response = await request.get("/api/pokemon");
         expect(JSON.parse(response.text).length == pokeData.pokemon.length).to
@@ -34,18 +34,9 @@ describe("Pokemon API Server", () => {
 
         expect(JSON.parse(response.text).length == 100).to.be.true;
       });
-
-      /*
-
-      GET /api/pokemon/:id
-      It should return the Pokemon with the given id. 
-      Example: GET /api/pokemon/042 should return the data for Golbat
-      Leading zeroes should not be necessary, so GET /api/pokemon/42 would also return Golbat
-
-      */
     });
 
-    xdescribe("/api/pokemon/:id", () => {
+    describe("/api/pokemon/:id", () => {
       it("should return pokemon with the given ID", async () => {
         const response = await request.get("/api/pokemon").query({ id: 1 });
 
@@ -69,7 +60,7 @@ describe("Pokemon API Server", () => {
       It should add a Pokemon.
   */
 
-    xdescribe("POST", () => {
+    describe("POST", () => {
       describe("/api/pokemon", () => {
         it("should add Pokemon", async () => {
           const expected = {

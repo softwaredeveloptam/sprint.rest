@@ -47,6 +47,30 @@ const setupServer = () => {
     } else response.send(pokeData.pokemon);
   });
 
+  app.get(`/api/pokemon/:idOrName/evolutions`, (request, response) => {
+    const id = parseInt(request.params.idOrName) - 1;
+
+    if (id >= 0) {
+      if (pokeData.pokemon[id].evolutions) {
+        response.send(pokeData.pokemon[id].evolutions);
+      } else {
+        response.send({});
+      }
+    }
+  });
+
+  app.get(`/api/pokemon/:idOrName/evolutions/previous`, (request, response) => {
+    const id = parseInt(request.params.idOrName) - 1;
+
+    if (id >= 0) {
+      if (pokeData.pokemon[id]["Previous evolution(s)"]) {
+        response.send(pokeData.pokemon[id]["Previous evolution(s)"]);
+      } else {
+        response.send({});
+      }
+    }
+  });
+
   app.post("/api/pokemon", (request, response) => {
     response.send(request.body);
     // need to send back status 201
@@ -73,15 +97,14 @@ const setupServer = () => {
   });
 
   app.delete("/api/pokemon/:idOrName", (request, response) => {
-    const id = request.params.idOrName;
+    const id = parseInt(request.params.idOrName) - 1;
 
     if (id >= 0) {
       // delete pokeData.pokemon[id]
-      pokeData.pokemon[id];
+      delete pokeData.pokemon[id];
+      response.send(pokeData.pokemon[id]);
     }
   });
-
-  // app.get("/api/pokemon/:id")
 
   return app;
 };

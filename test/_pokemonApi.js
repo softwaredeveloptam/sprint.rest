@@ -20,7 +20,7 @@ describe("Pokemon API Server", () => {
     request = chai.request(server);
   });
 
-  xdescribe("GET", () => {
+  describe("GET", () => {
     describe("/api/pokemon", () => {
       it("should return all pokemon", async () => {
         const response = await request.get("/api/pokemon");
@@ -54,6 +54,73 @@ describe("Pokemon API Server", () => {
         expect(JSON.parse(response.text)).to.be.deep.equal(pokeData.pokemon[0]);
       });
     });
+
+    /*
+
+    It should return the evolutions a Pokemon has.
+      Note that some Pokemon don't have evolutions, it should return an empty array in this case
+      Example: GET /api/pokemon/staryu/evolutions should return [ { "id": 121, "name": "Starmie" } ]
+
+    */
+
+    describe("/api/pokemon/:idOrName/evolutions", () => {
+      it("should return the evolutions a Pokemon has", async () => {
+        const expected = {
+          id: 001,
+          name: "Bulbasaur",
+        };
+
+        const id = expected.id;
+
+        const response = await request.get(`/api/pokemon/${id}/evolutions`);
+
+        // expected to equal pokemon evolutions
+        expect(JSON.parse(response.text)).to.be.deep.equal(
+          pokeData.pokemon[0].evolutions
+        );
+      });
+
+      it("should return an empty case if the Pokemon has no evolutions", async () => {
+        const expected = {
+          id: 143,
+          name: "Snorlax",
+        };
+
+        const id = expected.id;
+
+        const response = await request.get(`/api/pokemon/${id}/evolutions`);
+
+        // expected to return an empty object because it doesn't have evolutions
+
+        expect(JSON.parse(response.text)).to.be.deep.equal({});
+      });
+    });
+
+    /*
+      GET /api/pokemon/:idOrName/evolutions/previous
+      For evolved Pokemon, this should return it's previous evolutions
+      Example: GET /api/pokemon/17/evolutions/previous should return [ { "id": 16, "name": "Pidgey" } ]
+    */
+
+    describe("/api/pokemon/:idOrName/evolutions/previous", () => {
+      it("should return an evolved Pokemon's previous evolution", async () => {
+        const expected = {
+          id: 003,
+          name: "Venusaur",
+        };
+
+        const id = expected.id;
+
+        const response = await request.get(
+          `/api/pokemon/${id}/evolutions/previous`
+        );
+
+        // expected to return Venusaur's previous evolution
+        expect(JSON.parse(response.text)).to.be.deep.equal(
+          pokeData.pokemon[2]["Previous evolution(s)"]
+        );
+      });
+    });
   });
 
   /*
@@ -81,16 +148,11 @@ describe("Pokemon API Server", () => {
     });
   });
 
-  /*
-
-  DELETE /api/pokemon/:idOrName
-    It should allow you to make partial modifications to a Pokemon
-
-  */
-
-  describe("DELETE", () => {
+  xdescribe("DELETE", () => {
     describe("/api/pokemon/:idOrName", () => {
       it("should delete given pokemon", async () => {
+        const savePokeData = Array.from(pokeData);
+
         const expected = {
           id: 001,
           name: "Bulbasaur",
@@ -98,14 +160,12 @@ describe("Pokemon API Server", () => {
 
         const id = expected.id;
 
-        const response = await request.delete(`/api/pokemon/:${id}`);
-        // const responseName = await request
-        //   .get("/api/pokemon")
-        //   .query({ name: "Bulbasaur" });
-        // expect bulbasaur to not exist ?
+        const response = await request.delete(`/api/pokemon/${id}`);
 
-        expect(JSON.parse(response.text).length == pokeData.pokemon.length).to
-          .be.true;
+        // checks if bulbasaur is deleted
+        expect(JSON.parse(response.text !== expected)).to.be.true;
+
+        pokeData = savePokeData;
       });
     });
   });
@@ -123,7 +183,7 @@ describe("Pokemon API Server", () => {
         const id = expected.id;
 
         const response = await request
-          .patch(`/api/pokemon/:${id}`) //.patch("/api/pokemon/001") //patch('/api/pokemon/:id')
+          .patch(`/api/pokemon/${id}`) //.patch("/api/pokemon/001") //patch('/api/pokemon/:id')
           // .query({ id: 1 })
           .send(expected);
 

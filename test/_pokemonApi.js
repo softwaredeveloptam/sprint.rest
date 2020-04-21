@@ -20,7 +20,7 @@ describe("Pokemon API Server", () => {
     request = chai.request(server);
   });
 
-  describe("GET", () => {
+  xdescribe("GET", () => {
     describe("/api/pokemon", () => {
       it("should return all pokemon", async () => {
         const response = await request.get("/api/pokemon");
@@ -55,14 +55,6 @@ describe("Pokemon API Server", () => {
       });
     });
 
-    /*
-
-    It should return the evolutions a Pokemon has.
-      Note that some Pokemon don't have evolutions, it should return an empty array in this case
-      Example: GET /api/pokemon/staryu/evolutions should return [ { "id": 121, "name": "Starmie" } ]
-
-    */
-
     describe("/api/pokemon/:idOrName/evolutions", () => {
       it("should return the evolutions a Pokemon has", async () => {
         const expected = {
@@ -71,7 +63,6 @@ describe("Pokemon API Server", () => {
         };
 
         const id = expected.id;
-
         const response = await request.get(`/api/pokemon/${id}/evolutions`);
 
         // expected to equal pokemon evolutions
@@ -91,16 +82,9 @@ describe("Pokemon API Server", () => {
         const response = await request.get(`/api/pokemon/${id}/evolutions`);
 
         // expected to return an empty object because it doesn't have evolutions
-
         expect(JSON.parse(response.text)).to.be.deep.equal({});
       });
     });
-
-    /*
-      GET /api/pokemon/:idOrName/evolutions/previous
-      For evolved Pokemon, this should return it's previous evolutions
-      Example: GET /api/pokemon/17/evolutions/previous should return [ { "id": 16, "name": "Pidgey" } ]
-    */
 
     describe("/api/pokemon/:idOrName/evolutions/previous", () => {
       it("should return an evolved Pokemon's previous evolution", async () => {
@@ -121,12 +105,153 @@ describe("Pokemon API Server", () => {
         );
       });
     });
-  });
 
-  /*
-    POST /api/pokemon
-      It should add a Pokemon.
-  */
+    describe("/api/types", () => {
+      it("it should return all available types", async () => {
+        const response = await request.get(`/api/types`);
+
+        // should return all available types
+        expect(JSON.parse(response.text)).to.be.deep.equal(pokeData.types);
+      });
+
+      it("should take query parameter `limit=n` that makes endpoint return only `n` types", async () => {
+        const response = await request.get("/api/types").query({ limit: 5 });
+
+        // should return the query number of types
+        expect(JSON.parse(response.text).length == 5).to.be.true;
+      });
+    });
+
+    describe("/api/types/:type/pokemon", () => {
+      it("it should return all Pokemon that are of a given type", async () => {
+        const expectWord = {
+          type: "Dragon",
+        };
+        const type = expectWord.type;
+
+        const expected = [
+          {
+            id: "147",
+            name: "Dratini",
+          },
+          {
+            id: "148",
+            name: "Dragonair",
+          },
+          {
+            id: "149",
+            name: "Dragonite",
+          },
+        ];
+
+        const response = await request.get(`/api/types/${type}/pokemon`);
+
+        // should return all available types
+        expect(JSON.parse(response.text)).to.be.deep.equal(expected);
+      });
+    });
+
+    describe("/api/attacks", () => {
+      it("it should return all attacks", async () => {
+        const response = await request.get(`/api/attacks`);
+
+        // should return all available attacks
+        expect(JSON.parse(response.text)).to.be.deep.equal(pokeData.attacks);
+      });
+
+      it("should take query parameter `limit=n` that makes endpoint return only `n` attacks", async () => {
+        const response = await request.get("/api/attacks").query({ limit: 5 });
+
+        // should return the query number of fast types
+        // can change to send only just fast or special type of attacks
+        expect(JSON.parse(response.text).length == 5).to.be.true;
+      });
+    });
+
+    describe("/api/attacks/fast", () => {
+      it("it should return all fast attacks", async () => {
+        const response = await request.get(`/api/attacks/fast`);
+
+        // should return all available fast attacks
+        expect(JSON.parse(response.text)).to.be.deep.equal(
+          pokeData.attacks.fast
+        );
+      });
+
+      it("should take query parameter `limit=n` that makes endpoint return only `n` attacks", async () => {
+        const response = await request
+          .get(`/api/attacks/fast`)
+          .query({ limit: 5 });
+
+        // should return the query number of types
+        expect(JSON.parse(response.text).length == 5).to.be.true;
+      });
+    });
+
+    describe("/api/attacks/special", () => {
+      it("it should return all special attacks", async () => {
+        const response = await request.get(`/api/attacks/special`);
+
+        // should return all available fast attacks
+        expect(JSON.parse(response.text)).to.be.deep.equal(
+          pokeData.attacks.special
+        );
+      });
+
+      it("should take query parameter `limit=n` that makes endpoint return only `n` attacks", async () => {
+        const response = await request
+          .get(`/api/attacks/special`)
+          .query({ limit: 5 });
+
+        // should return the query number of types
+        expect(JSON.parse(response.text).length == 5).to.be.true;
+      });
+    });
+
+    describe("/api/attacks/:name", () => {
+      it("should return a specific attack by name, no matter if it is fast or special", async () => {
+        const expected = {
+          name: "Tackle",
+          type: "Normal",
+          damage: 12,
+        };
+        let name = expected.name;
+
+        const response = await request.get(`/api/attacks/${name}`);
+
+        expect(JSON.parse(response.text)).to.be.deep.equal(expected);
+      });
+    });
+
+    describe("/api/attacks/:name/pokemon", () => {
+      it("should return all Pokemon (id and name) that have an attack with the given name", async () => {
+        const expectWord = {
+          name: "Psycho Cut",
+        };
+        const name = expectWord.name;
+
+        const expected = [
+          {
+            id: "064",
+            name: "Kadabra",
+          },
+          {
+            id: "065",
+            name: "Alakazam",
+          },
+          {
+            id: "150",
+            name: "Mewtwo",
+          },
+        ];
+
+        const response = await request.get(`/api/attacks/${name}/pokemon`);
+
+        // should return all Pokemon (id & name) with Psycho Cut move
+        expect(JSON.parse(response.text)).to.be.deep.equal(expected);
+      });
+    });
+  });
 
   xdescribe("POST", () => {
     describe("/api/pokemon", () => {
@@ -146,26 +271,58 @@ describe("Pokemon API Server", () => {
         expect(JSON.parse(response.text)).to.be.deep.equal(expected);
       });
     });
+
+    describe("/api/types", () => {
+      it("adds a new type", async () => {
+        const test = Array.from(pokeData.types);
+
+        const expected = { type: "magic" };
+        const expectWord = expected.type;
+
+        const response = await request.post("/api/types").send(expected);
+
+        // expects Magic to be added into Types
+        expect(JSON.parse(response.text)).to.include(expectWord);
+
+        pokeData.types = test;
+      });
+    });
   });
 
   xdescribe("DELETE", () => {
     describe("/api/pokemon/:idOrName", () => {
       it("should delete given pokemon", async () => {
-        const savePokeData = Array.from(pokeData);
+        const savePokeData = Array.from(pokeData.pokemon);
 
-        const expected = {
+        let expected = {
           id: 001,
           name: "Bulbasaur",
         };
 
-        const id = expected.id;
+        let id = expected.id;
 
         const response = await request.delete(`/api/pokemon/${id}`);
 
         // checks if bulbasaur is deleted
-        expect(JSON.parse(response.text !== expected)).to.be.true;
+        expect(JSON.parse(response.text.includes(expected))).to.be.false;
 
-        pokeData = savePokeData;
+        pokeData.pokemon = savePokeData;
+      });
+    });
+
+    describe("/api/types/:name", () => {
+      it("should delete given type", async () => {
+        const savePokeDataTypes = Array.from(pokeData.types);
+
+        let expected = { type: "Dragon" };
+        let name = expected.type;
+
+        const response = await request.delete(`/api/types/${name}`);
+
+        // checks if magic is deleted
+        expect(JSON.parse(response.text.includes(name))).to.be.false;
+
+        pokeData.types = savePokeDataTypes;
       });
     });
   });
@@ -190,27 +347,5 @@ describe("Pokemon API Server", () => {
         expect(JSON.parse(response.text)).to.be.deep.equal(expected);
       });
     });
-
-    //   describe("/api/attacks/:name", () => {
-    //     it("should modify specified attack", () => {
-
-    //     });
   });
 });
-
-//  it("POST /echo returns body content", async () => {
-//         const expected = {
-//           foo: "bar",
-//           honey: ["I", "shrank", "the", "kids"],
-//           loopy: {
-//             loop: {
-//               deeply: {
-//                 nested: [1, "123", [{ lol: "lol" }, null, null, 5]],
-//               },
-//             },
-//           },
-//         };
-//         const res = await request.post("/echo").send(expected);
-//         res.should.be.json;
-//         JSON.parse(res.text).should.deep.equal(expected);
-//       });

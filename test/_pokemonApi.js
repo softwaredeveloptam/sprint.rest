@@ -53,145 +53,86 @@ describe("Pokemon API Server", () => {
         expect(JSON.parse(response.text)).to.be.deep.equal(pokeData.pokemon[0]);
       });
     });
-    // });
+  });
 
-    /*
+  /*
     POST /api/pokemon
       It should add a Pokemon.
   */
 
-    xdescribe("POST", () => {
-      describe("/api/pokemon", () => {
-        it("should add Pokemon", async () => {
-          const expected = {
-            name: "Tam",
-            honey: ["I", "shrank", "the", "kids"],
-            loopy: {
-              loop: {
-                deeply: {
-                  nested: [1, "123", [{ lol: "lol" }, null, null, 5]],
-                },
+  xdescribe("POST", () => {
+    describe("/api/pokemon", () => {
+      it("should add Pokemon", async () => {
+        const expected = {
+          name: "Tam",
+          honey: ["I", "shrank", "the", "kids"],
+          loopy: {
+            loop: {
+              deeply: {
+                nested: [1, "123", [{ lol: "lol" }, null, null, 5]],
               },
             },
-          };
-          const response = await request.post("/api/pokemon").send(expected);
-          expect(JSON.parse(response.text)).to.be.deep.equal(expected);
-        });
+          },
+        };
+        const response = await request.post("/api/pokemon").send(expected);
+        expect(JSON.parse(response.text)).to.be.deep.equal(expected);
       });
     });
+  });
 
-    /*
+  /*
 
   DELETE /api/pokemon/:idOrName
     It should allow you to make partial modifications to a Pokemon
 
   */
 
-    xdescribe("DELETE", () => {
-      describe("/api/pokemon/:idOrName", () => {
-        it("should delete givein pokemon", async () => {
-          const responseId = await request.get("/api/pokemon").query({ id: 1 });
-          const responseName = await request
-            .get("/api/pokemon")
-            .query({ name: "Bulbasaur" });
+  describe("DELETE", () => {
+    describe("/api/pokemon/:idOrName", () => {
+      it("should delete given pokemon", async () => {
+        const expected = {
+          id: 001,
+          name: "Bulbasaur",
+        };
 
-          expect(JSON.parse(response.text).length == pokeData.pokemon.length).to
-            .be.true;
-        });
+        const id = expected.id;
+
+        const response = await request.delete(`/api/pokemon/:${id}`);
+        // const responseName = await request
+        //   .get("/api/pokemon")
+        //   .query({ name: "Bulbasaur" });
+
+        expect(JSON.parse(response.text).length == pokeData.pokemon.length).to
+          .be.true;
+      });
+    });
+  });
+
+  // fix later
+  xdescribe("PATCH", () => {
+    describe(`/api/pokemon/:idOrName`, () => {
+      it("should allow you to make partial modifications to a Pokemon", async () => {
+        const expected =
+          //JSON.parse(
+          {
+            id: "001",
+            name: "MODIFIED_Bulbasaur!!!!!!!",
+          };
+        const id = expected.id;
+
+        const response = await request
+          .patch(`/api/pokemon/:${id}`) //.patch("/api/pokemon/001") //patch('/api/pokemon/:id')
+          // .query({ id: 1 })
+          .send(expected);
+
+        expect(JSON.parse(response.text)).to.be.deep.equal(expected);
       });
     });
 
-    /*
+    //   describe("/api/attacks/:name", () => {
+    //     it("should modify specified attack", () => {
 
-  PATCH /api/pokemon/:idOrName
-    It should allow you to make partial modifications to a Pokemon
-
-  */
-
-    xdescribe("PATCH", () => {
-      describe("/api/pokemon/:idOrName", () => {
-        it("should allow you to make partial modifications to a Pokemon", async () => {
-          const expected =
-            //JSON.parse(
-            {
-              id: "001",
-              name: "MODIFIED_Bulbasaur!!!!!!!",
-              classification: "Seed Pokémon",
-              types: ["Grass", "Poison"],
-              resistant: ["Water", "Electric", "Grass", "Fighting", "Fairy"],
-              weaknesses: ["Fire", "Ice", "Flying", "Psychic"],
-              weight: {
-                minimum: "6.04kg",
-                maximum: "7.76kg",
-              },
-              height: {
-                minimum: "0.61m",
-                maximum: "0.79m",
-              },
-              fleeRate: 0.1,
-              evolutionRequirements: {
-                amount: 25,
-                name: "Bulbasaur candies",
-              },
-              evolutions: [
-                {
-                  id: 2,
-                  name: "Ivysaur",
-                },
-                {
-                  id: 3,
-                  name: "Venusaur",
-                },
-              ],
-              maxCP: 951,
-              maxHP: 1071,
-              attacks: {
-                fast: [
-                  {
-                    name: "Tackle",
-                    type: "Normal",
-                    damage: 12,
-                  },
-                  {
-                    name: "Vine Whip",
-                    type: "Grass",
-                    damage: 7,
-                  },
-                ],
-                special: [
-                  {
-                    name: "Power Whip",
-                    type: "Grass",
-                    damage: 70,
-                  },
-                  {
-                    name: "Seed Bomb",
-                    type: "Grass",
-                    damage: 40,
-                  },
-                  {
-                    name: "Sludge Bomb",
-                    type: "Poison",
-                    damage: 55,
-                  },
-                ],
-              },
-            };
-
-          const response = await request
-            .patch("/api/pokemon")
-            .query({ id: 1 })
-            .send(expected);
-
-          expect(JSON.parse(response.text)).to.be.deep.equal(expected);
-        });
-      });
-
-      //   describe("/api/attacks/:name", () => {
-      //     it("should modify specified attack", () => {
-
-      //     });
-    });
+    //     });
   });
 });
 

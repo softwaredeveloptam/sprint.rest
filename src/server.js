@@ -49,26 +49,32 @@ const setupServer = () => {
 
   app.post("/api/pokemon", (request, response) => {
     response.send(request.body);
+    // need to send back status 201
   });
 
-  app.patch("/api/pokemon", (request, response) => {
+  app.patch(`/api/pokemon/:idOrName`, (request, response) => {
+    const id = request.params.idOrName;
+    // const pokemonName = request.params.name
+    // const id = undefined || removeZeros(request.body.id);
+
     const indexOfPokemon =
-      undefined || findPokemonIndexByName(request.query.name);
-    const id = undefined || removeZeros(request.query.id);
-    // const id = undefined || request.query.id;
+      undefined || findPokemonIndexByName(request.body.name); // const id = undefined || request.query.id;
     // const name = undefined || request.query.name;
 
-    const index = id - 1 || indexOfPokemon;
-    if (index) {
+    const index = id - 1; //|| indexOfPokemon;
+    if (index >= 0) {
       // for (let i = 0; i < pokeData.pokemon.length; i++) {
       //   if (id === pokeData.pokemon[i].id) {
       pokeData.pokemon[index] = request.body;
       response.send(pokeData.pokemon[index]);
+      // request.params
       // break;
     }
   });
 
-  app.delete("/api/pokemon", (request, response) => {});
+  app.delete("/api/pokemon/:idOrName", (request, response) => {
+    const id = request.params.idOrName;
+  });
 
   // app.get("/api/pokemon/:id")
 

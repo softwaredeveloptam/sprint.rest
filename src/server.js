@@ -74,6 +74,11 @@ const setupServer = () => {
 
   app.delete("/api/pokemon/:idOrName", (request, response) => {
     const id = request.params.idOrName;
+
+    if (id >= 0) {
+      // delete pokeData.pokemon[id]
+      pokeData.pokemon[id];
+    }
   });
 
   // app.get("/api/pokemon/:id")

@@ -4,6 +4,7 @@ chai.use(chaiHttp);
 const { setupServer } = require("../src/server");
 const pokeData = require("../src/data");
 const { expect } = require("chai");
+const sinon = require("sinon");
 
 /*
  * This sprint you will have to create all tests yourself, TDD style.
@@ -101,6 +102,7 @@ describe("Pokemon API Server", () => {
         // const responseName = await request
         //   .get("/api/pokemon")
         //   .query({ name: "Bulbasaur" });
+        // expect bulbasaur to not exist ?
 
         expect(JSON.parse(response.text).length == pokeData.pokemon.length).to
           .be.true;
@@ -113,7 +115,7 @@ describe("Pokemon API Server", () => {
     describe(`/api/pokemon/:idOrName`, () => {
       it("should allow you to make partial modifications to a Pokemon", async () => {
         const expected =
-          //JSON.parse(
+          // JSON.parse(
           {
             id: "001",
             name: "MODIFIED_Bulbasaur!!!!!!!",
